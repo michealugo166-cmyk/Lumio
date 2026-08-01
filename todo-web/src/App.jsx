@@ -59,47 +59,48 @@ const globalStyles = `
     cursor: pointer; position: relative; margin-bottom: -10px; z-index: 2;
   }
 
+  .lamp-mount {
+    width: 16px; height: 6px; border-radius: 3px 3px 0 0;
+    background: linear-gradient(to bottom, var(--lamp-body), var(--text2));
+  }
+
   .lamp-cord {
-    width: 3px; height: 60px;
+    width: 3px; height: 42px;
     background: linear-gradient(to bottom, var(--text2), var(--lamp-body));
     border-radius: 2px; transition: all 0.4s;
   }
 
-  .lamp-shade {
-    width: 0; height: 0;
-    border-left: 50px solid transparent; border-right: 50px solid transparent;
-    border-top: 0px solid transparent; border-bottom: 60px solid var(--lamp-shade);
-    filter: drop-shadow(0 0 0px transparent); transition: all 0.5s ease; position: relative;
+  .lamp-svg { display: block; overflow: visible; }
+
+  .lamp-shade-path {
+    fill: url(#shadeGrad); stroke: var(--lamp-body); stroke-width: 1.5;
+    stroke-linejoin: round; transition: filter 0.5s ease;
   }
 
-  .lamp-shade.on {
-    border-bottom-color: var(--lamp-shade);
-    filter: drop-shadow(0 6px 20px var(--lamp-glow)) drop-shadow(0 0 40px var(--lamp-glow));
+  .lamp-wrapper.on .lamp-shade-path {
+    filter: drop-shadow(0 4px 14px var(--lamp-glow));
   }
 
-  .lamp-bulb {
-    width: 20px; height: 20px; background: #888; border-radius: 50%;
-    margin-top: -4px; transition: all 0.5s; box-shadow: none;
+  .lamp-rim-top { fill: var(--lamp-body); opacity: 0.85; }
+  .lamp-rim-bottom { fill: #000; opacity: 0.3; }
+
+  .lamp-bulb-group { transition: filter 0.5s ease; }
+
+  .lamp-wrapper.on .lamp-bulb-group {
+    filter: drop-shadow(0 0 6px var(--lamp-glow)) drop-shadow(0 0 16px var(--lamp-glow));
   }
 
-  .lamp-bulb.on {
-    background: #fff7c0;
-    box-shadow: 0 0 12px 4px #ffe87a, 0 0 30px 10px rgba(255,220,80,0.5);
+  .lamp-bulb-glass { fill: url(#bulbGrad); transition: fill 0.4s ease; }
+
+  .lamp-glow-ellipse {
+    opacity: 0; transition: opacity 0.6s ease;
   }
 
-  .lamp-beam {
-    width: 0; height: 0;
-    border-left: 70px solid transparent; border-right: 70px solid transparent;
-    border-top: 140px solid transparent; margin-top: -2px;
-    transition: all 0.6s ease; opacity: 0;
+  .lamp-wrapper.on .lamp-glow-ellipse {
+    opacity: 1; animation: beamPulse 3s ease-in-out infinite;
   }
 
-  .lamp-beam.on {
-    border-top-color: var(--lamp-glow); opacity: 1;
-    animation: beamPulse 3s ease-in-out infinite;
-  }
-
-  @keyframes beamPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  @keyframes beamPulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
 
   .lamp-click-hint {
     font-size: 11px; color: var(--text2); letter-spacing: 0.12em;
@@ -398,11 +399,41 @@ function StyleTag() {
 
 function Lamp({ isOn, onToggle }) {
   return (
-    <div className="lamp-wrapper" onClick={onToggle} title="Click to toggle lamp">
+    <div className={`lamp-wrapper ${isOn ? "on" : ""}`} onClick={onToggle} title="Click to toggle lamp">
+      <div className="lamp-mount" />
       <div className="lamp-cord" />
-      <div className={`lamp-shade ${isOn ? "on" : ""}`} />
-      <div className={`lamp-bulb ${isOn ? "on" : ""}`} />
-      <div className={`lamp-beam ${isOn ? "on" : ""}`} />
+      <svg className="lamp-svg" width="110" height="120" viewBox="0 0 110 120">
+        <defs>
+          <linearGradient id="shadeGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="var(--lamp-shade)" stopOpacity="0.55" />
+            <stop offset="45%" stopColor="var(--lamp-shade)" />
+            <stop offset="100%" stopColor="var(--lamp-body)" />
+          </linearGradient>
+          <radialGradient id="bulbGrad" cx="45%" cy="35%" r="65%">
+            <stop offset="0%" stopColor={isOn ? "#fffbe6" : "#d8d8d8"} />
+            <stop offset="55%" stopColor={isOn ? "#ffe27a" : "#a3a3a3"} />
+            <stop offset="100%" stopColor={isOn ? "#f2ab2e" : "#7a7a7a"} />
+          </radialGradient>
+          <radialGradient id="glowGrad" cx="50%" cy="0%" r="75%">
+            <stop offset="0%" stopColor="var(--lamp-glow)" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="var(--lamp-glow)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        <ellipse className="lamp-glow-ellipse" cx="55" cy="88" rx="52" ry="30" fill="url(#glowGrad)" />
+
+        <path d="M48 0 L48 8 M62 0 L62 8" stroke="var(--lamp-body)" strokeWidth="2" strokeLinecap="round" />
+
+        <path className="lamp-shade-path" d="M43 8 L67 8 L90 50 L20 50 Z" />
+        <ellipse className="lamp-rim-top" cx="55" cy="8" rx="12" ry="2.5" />
+        <ellipse className="lamp-rim-bottom" cx="55" cy="50" rx="35" ry="5.5" />
+
+        <g className="lamp-bulb-group">
+          <line x1="55" y1="50" x2="55" y2="58" stroke="var(--lamp-body)" strokeWidth="2" />
+          <circle className="lamp-bulb-glass" cx="55" cy="66" r="9" />
+          <circle cx="52" cy="63" r="2.2" fill="#fff" opacity={isOn ? 0.85 : 0.25} />
+        </g>
+      </svg>
       <div className="lamp-click-hint">{isOn ? "Turn off" : "Turn on"}</div>
     </div>
   );
