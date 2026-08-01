@@ -7,10 +7,11 @@ const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Di
 const globalStyles = `
   ${FONTS}
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { max-width: 100%; overflow-x: hidden; }
   body { font-family: 'DM Sans', sans-serif; }
 
   .app-root {
-    min-height: 100vh;
+    min-height: 100vh; max-width: 100%; overflow-x: hidden;
     transition: background 0.6s ease, color 0.6s ease;
   }
 
@@ -230,15 +231,19 @@ const globalStyles = `
 
   .todo-header {
     display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
     padding: 24px 0 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 40px;
   }
 
   .todo-brand {
     font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
-    color: var(--accent); letter-spacing: 0.04em;
+    color: var(--accent); letter-spacing: 0.04em; flex-shrink: 0;
   }
 
-  .header-right { display: flex; align-items: center; gap: 12px; }
+  .header-right {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 12px; min-width: 0;
+  }
 
   .mode-toggle {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 50px;
@@ -262,7 +267,7 @@ const globalStyles = `
   }
 
   .todo-greeting {
-    font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700;
+    font-family: 'Playfair Display', serif; font-size: clamp(26px, 7vw, 36px); font-weight: 700;
     line-height: 1.2; margin-bottom: 6px;
   }
 
@@ -285,7 +290,7 @@ const globalStyles = `
   }
 
   .stats-bar {
-    max-width: 640px; margin: 0 auto 20px; display: flex; gap: 16px;
+    max-width: 640px; margin: 0 auto 20px; display: flex; flex-wrap: wrap; gap: 16px;
     font-size: 12px; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase;
   }
 
@@ -380,6 +385,8 @@ const globalStyles = `
     font-size: 11px; color: var(--text2); background: var(--card);
     border: 1px solid var(--card-border); border-radius: 50px;
     padding: 4px 10px; letter-spacing: 0.04em;
+    max-width: 45vw; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; display: inline-block;
   }
 `;
 
